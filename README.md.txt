@@ -81,12 +81,28 @@ DatingApp/
 
 ###Docker Support
 
-You can also run the app using Docker Compose:
+version: '3.8'
 
-docker-compose up --build
+services:
+  sql:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    container_name: datingapp_sql
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "1"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:-StrongP@ssw0rd123}"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "sqlcmd", "-U", "sa", "-P", "${MSSQL_SA_PASSWORD:-StrongP@ssw0rd123}", "-Q", "SELECT 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
-Make sure your appsettings.json or environment variables are configured to connect to the SQL container (Server=sql;User=sa; Password= SA_PASSWORD;).
-
+volumes:
+  sql_data:
 
 
 ###Future Improvements 
