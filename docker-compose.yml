@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  sql:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    container_name: datingapp_sql
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "1"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:-StrongP@ssw0rd123}"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "sqlcmd", "-U", "sa", "-P", "${MSSQL_SA_PASSWORD:-StrongP@ssw0rd123}", "-Q", "SELECT 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  sql_data:
